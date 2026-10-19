@@ -156,7 +156,7 @@ public class RaftController extends AbstractEntityController {
             return Util.callPistonPushEvent(npc) ? PushReaction.IGNORE_ENTITY : super.getPistonPushReaction();
         }
 
-        private Status getStatus() {
+        public Status getStatus() {
             Status entityRaft_Status = isUnderwater();
             if (entityRaft_Status != null) {
                 this.waterLevel = getBoundingBox().maxY;

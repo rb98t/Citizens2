@@ -99,7 +99,7 @@ public class ChestRaftController extends AbstractEntityController {
             return Util.callPistonPushEvent(npc) ? PushReaction.IGNORE_ENTITY : super.getPistonPushReaction();
         }
 
-        private Status getStatus() {
+        public Status getStatus() {
             Status entityRaft_Status = u();
             if (entityRaft_Status != null) {
                 this.aC = getBoundingBox().maxY;

@@ -3,7 +3,7 @@ package net.citizensnpcs.nms.v26_3_R1.entity.nonliving;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftSplashPotion;
+import org.bukkit.craftbukkit.entity.CraftThrownSplashPotion;
 
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.nms.v26_3_R1.entity.MobEntityController;
@@ -114,7 +114,7 @@ public class ThrownSplashPotionController extends MobEntityController {
 
     }
 
-    public static class SplashThrownPotionNPC extends CraftSplashPotion implements NPCHolder {
+    public static class SplashThrownPotionNPC extends CraftThrownSplashPotion implements NPCHolder {
         private final CitizensNPC npc;
 
         public SplashThrownPotionNPC(EntityThrownSplashPotionNPC entity) {

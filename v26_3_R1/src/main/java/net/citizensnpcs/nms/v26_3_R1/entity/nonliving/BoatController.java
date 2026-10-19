@@ -207,7 +207,7 @@ public class BoatController extends AbstractEntityController {
             return Util.callPistonPushEvent(npc) ? PushReaction.IGNORE_ENTITY : super.getPistonPushReaction();
         }
 
-        private Status getStatus() {
+        public Status getStatus() {
             Status entityboat_Status = isUnderwater();
             if (entityboat_Status != null) {
                 this.waterLevel = getBoundingBox().maxY;

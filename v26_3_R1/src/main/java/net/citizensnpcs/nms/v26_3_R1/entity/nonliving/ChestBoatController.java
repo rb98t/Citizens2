@@ -136,7 +136,7 @@ public class ChestBoatController extends AbstractEntityController {
             return Util.callPistonPushEvent(npc) ? PushReaction.IGNORE_ENTITY : super.getPistonPushReaction();
         }
 
-        private Status getStatus() {
+        public Status getStatus() {
             Status entityboat_Status = u();
             if (entityboat_Status != null) {
                 this.aC = getBoundingBox().maxY;

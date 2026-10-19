@@ -3,7 +3,7 @@ package net.citizensnpcs.nms.v26_3_R1.entity.nonliving;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftLingeringPotion;
+import org.bukkit.craftbukkit.entity.CraftThrownLingeringPotion;
 
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.nms.v26_3_R1.entity.MobEntityController;
@@ -114,7 +114,7 @@ public class ThrownLingeringPotionController extends MobEntityController {
 
     }
 
-    public static class LingeringThrownPotionNPC extends CraftLingeringPotion implements NPCHolder {
+    public static class LingeringThrownPotionNPC extends CraftThrownLingeringPotion implements NPCHolder {
         private final CitizensNPC npc;
 
         public LingeringThrownPotionNPC(EntityThrownLingeringPotionNPC entity) {
