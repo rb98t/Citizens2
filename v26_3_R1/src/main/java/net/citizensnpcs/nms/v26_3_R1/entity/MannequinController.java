@@ -140,12 +140,12 @@ public class MannequinController extends MobEntityController {
         }
 
         @Override
-        protected SoundEvent getDeathSound() {
+        public SoundEvent getDeathSound() {
             return NMSImpl.getSoundEffect(npc, super.getDeathSound(), NPC.Metadata.DEATH_SOUND);
         }
 
         @Override
-        protected SoundEvent getHurtSound(DamageSource damagesource) {
+        public SoundEvent getHurtSound(DamageSource damagesource) {
             return NMSImpl.getSoundEffect(npc, super.getHurtSound(damagesource), NPC.Metadata.HURT_SOUND);
         }
 

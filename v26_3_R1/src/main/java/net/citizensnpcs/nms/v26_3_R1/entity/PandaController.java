@@ -98,12 +98,12 @@ public class PandaController extends MobEntityController {
         }
 
         @Override
-        protected SoundEvent getAmbientSound() {
+        public SoundEvent getAmbientSound() {
             return NMSImpl.getSoundEffect(npc, super.getAmbientSound(), NPC.Metadata.AMBIENT_SOUND);
         }
 
         @Override
-        public CraftEntity getBukkitEntity() {
+        public org.bukkit.craftbukkit.entity.CraftLivingEntity getBukkitEntity() {
             if (npc != null && !(super.getBukkitEntity() instanceof NPCHolder)) {
                 NMSImpl.setBukkitEntity(this, new PandaNPC(this));
             }
@@ -111,12 +111,12 @@ public class PandaController extends MobEntityController {
         }
 
         @Override
-        protected SoundEvent getDeathSound() {
+        public SoundEvent getDeathSound() {
             return NMSImpl.getSoundEffect(npc, super.getDeathSound(), NPC.Metadata.DEATH_SOUND);
         }
 
         @Override
-        protected SoundEvent getHurtSound(DamageSource damagesource) {
+        public SoundEvent getHurtSound(DamageSource damagesource) {
             return NMSImpl.getSoundEffect(npc, super.getHurtSound(damagesource), NPC.Metadata.HURT_SOUND);
         }
 

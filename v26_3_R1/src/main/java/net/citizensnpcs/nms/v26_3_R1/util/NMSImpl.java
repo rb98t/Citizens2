@@ -429,7 +429,8 @@ public class NMSImpl implements NMSBridge {
 
     @Override
     public void activate(org.bukkit.entity.Entity entity) {
-        getHandle(entity).activatedTick = MinecraftServer.currentTick;
+        Entity handle = getHandle(entity);
+        handle.activatedTick = (int) handle.level().getGameTime();
     }
 
     @Override
@@ -511,7 +512,7 @@ public class NMSImpl implements NMSBridge {
                 (float) source.getAttributeValue(Attributes.ATTACK_KNOCKBACK));
         if (k > 0) {
             target.knockback(k * 0.5F, Mth.sin(source.getYRot() * 0.017453292F),
-                    -Mth.cos(source.getYRot() * 0.017453292F), ds, f, false, KnockbackCause.ENTITY_ATTACK);
+                    -Mth.cos(source.getYRot() * 0.017453292F), ds, f, false);
             source.setDeltaMovement(source.getDeltaMovement().multiply(0.6, 1, 0.6));
         }
         source.setLastHurtMob(target);
@@ -583,7 +584,6 @@ public class NMSImpl implements NMSBridge {
                 agg.send(arg0, uuid -> arg1.test((ServerPlayer) getHandle(Bukkit.getEntity(uuid))));
             }
 
-            @Override
             public void sendToTrackingPlayersFilteredAndSelf(Packet<? super ClientGamePacketListener> arg0,
                     Predicate<ServerPlayer> arg1) {
                 agg.send(arg0, uuid -> arg1.test((ServerPlayer) getHandle(Bukkit.getEntity(uuid))));
@@ -796,8 +796,7 @@ public class NMSImpl implements NMSBridge {
 
     @Override
     public EntityPacketTracker getPacketTracker(org.bukkit.entity.Entity entity) {
-        ServerLevel server = (ServerLevel) getHandle(entity).level();
-        TrackedEntity tracked = server.getChunkSource().chunkMap.entityMap.get(entity.getEntityId());
+        TrackedEntity tracked = getTrackedEntityFolia(getHandle(entity));
         if (tracked == null)
             return null;
         return new EntityPacketTracker() {
@@ -870,8 +869,7 @@ public class NMSImpl implements NMSBridge {
 
     @Override
     public org.bukkit.entity.Entity getSource(BlockCommandSender sender) {
-        Entity source = ((CraftBlockCommandSender) sender).getWrapper().getEntity();
-        return source != null ? source.getBukkitEntity() : null;
+        return null;
     }
 
     @Override
@@ -1424,7 +1422,7 @@ public class NMSImpl implements NMSBridge {
     @Override
     public void removeFromServerPlayerList(Player player) {
         ServerPlayer handle = (ServerPlayer) getHandle(player);
-        ((CraftServer) Bukkit.getServer()).getHandle().players.remove(handle);
+        ((CraftServer) Bukkit.getServer()).getHandle().getPlayers().remove(handle);
     }
 
     @Override
@@ -1450,39 +1448,21 @@ public class NMSImpl implements NMSBridge {
     @Override
     public void replaceTrackerEntry(org.bukkit.entity.Entity entity) {
         Entity handle = getHandle(entity);
-        ChunkMap cm = ((ServerLevel) handle.level()).getChunkSource().chunkMap;
-        TrackedEntity entry;
-        if (SpigotUtil.isFoliaServer()) {
+        try {
+            ServerLevel server = (ServerLevel) getHandle(entity).level();
+            TrackedEntity entry = getTrackedEntityFolia(handle);
+            if (entry == null)
+                return;
+            CitizensEntityTracker newTracker = new CitizensEntityTracker(server.getChunkSource().chunkMap, entry);
+            CitizensEntityTracker.transferSeenBy(entry, newTracker);
             try {
-                ServerLevel server = (ServerLevel) getHandle(entity).level();
-                entry = getTrackedEntityFolia(handle);
-                if (entry == null)
-                    return;
-                CitizensEntityTracker newTracker = new CitizensEntityTracker(server.getChunkSource().chunkMap, entry);
-                CitizensEntityTracker.transferSeenBy(entry, newTracker);
-                try {
-                    ENTITY_TRACKER_SETTER_FOLIA.invoke(handle, newTracker);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-            } catch (Exception exception) {
-                exception.printStackTrace();
+                ENTITY_TRACKER_SETTER_FOLIA.invoke(handle, newTracker);
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-            return;
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
-        entry = cm.entityMap.get(entity.getEntityId());
-        if (entry == null)
-            return;
-        entry.broadcastRemoved();
-        CitizensEntityTracker newTracker = new CitizensEntityTracker(cm, entry);
-        for (MethodHandle setter : TRACKED_ENTITY_SETTERS) {
-            try {
-                setter.invoke(handle, newTracker);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-        cm.entityMap.put(entity.getEntityId(), newTracker);
     }
 
     @Override
@@ -2398,12 +2378,7 @@ public class NMSImpl implements NMSBridge {
         }
         List<Packet<?>> toSend = new ArrayList<>();
         if (position) {
-            TrackedEntity entry = null;
-            if (SpigotUtil.isFoliaServer()) {
-                entry = getTrackedEntityFolia(handle);
-            } else {
-                entry = ((ServerLevel) handle.level()).getChunkSource().chunkMap.entityMap.get(handle.getId());
-            }
+            TrackedEntity entry = getTrackedEntityFolia(handle);
             if (entry == null) {
                 Messaging.debug("Null tracker entity for ", from);
                 return Collections.emptyList();
@@ -2934,7 +2909,7 @@ public class NMSImpl implements NMSBridge {
                 transition.position().z, transition.yRot(), transition.xRot()));
         Entity handle = ((CraftEntity) npc.getEntity()).getHandle();
         handle.setDeltaMovement(transition.deltaMovement());
-        handle.portalCooldown = entity.portalCooldown;
+        handle.setPortalCooldown(entity.getPortalCooldown());
         return handle;
     }
 
