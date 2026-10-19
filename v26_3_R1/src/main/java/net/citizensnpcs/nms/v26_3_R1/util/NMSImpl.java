@@ -451,7 +451,7 @@ public class NMSImpl implements NMSBridge {
             }
             isAdded.accept(success);
         };
-        if (SpigotUtil.isFoliaServer()) {
+        if (SpigotUtil.isFoliaServer() && !Bukkit.isOwnedByCurrentRegion(entity.getLocation())) {
             final Location location = entity.getLocation();
             CitizensAPI.getScheduler().runRegionTask(location.getWorld(), location.getBlockX() >> 4,
                     location.getBlockZ() >> 4, task);
