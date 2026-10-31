@@ -1042,7 +1042,12 @@ public class NMSImpl implements NMSBridge {
 
     @Override
     public boolean isValid(org.bukkit.entity.Entity entity) {
-        Entity handle = getHandle(entity);
+        // Folia: getHandle() asserts the owning region thread, but isValid() is called from
+        // foreign regions (event listeners such as FollowTrait) and from the global save task.
+        // Reading the valid/alive flags racily is fine for a liveness check.
+        if (!(entity instanceof CraftEntity))
+            return false;
+        Entity handle = ((CraftEntity) entity).getHandleRaw();
         return handle.valid && handle.isAlive();
     }
 

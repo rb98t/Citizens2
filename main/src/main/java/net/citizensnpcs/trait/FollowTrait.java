@@ -79,7 +79,9 @@ public class FollowTrait extends Trait {
 
     @EventHandler
     private void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (isActive() && protect && event.getEntity().equals(entity)) {
+        // Cheap identity check first: on Folia this listener fires for every damage event on
+        // every region, and isActive() touches this NPC's entity, which may live elsewhere.
+        if (protect && entity != null && event.getEntity().equals(entity) && isActive()) {
             Entity damager = event.getDamager();
             if (event.getEntity() instanceof Projectile) {
                 Projectile projectile = (Projectile) event.getEntity();
